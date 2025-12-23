@@ -53,11 +53,10 @@ const router = createRouter({
                     name: 'panel',
                     component: () => import('@/views/uikit/PanelsDoc.vue')
                 },
-
                 {
-                    path: '/uikit/overlay',
-                    name: 'overlay',
-                    component: () => import('@/views/uikit/OverlayDoc.vue')
+                    path: '/uikit/PatientsMain',
+                    name: 'PatientsMain',
+                    component: () => import('@/views/uikit/PatientsMain.vue')
                 },
                 {
                     path: '/uikit/media',

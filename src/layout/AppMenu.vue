@@ -12,11 +12,11 @@ const model = ref([
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'Prenatal Admission', icon: 'pi pi-fw pi-id-card', to: '/uikit/PrenatalAdmission' },
             { label: 'Family Planning Admission', icon: 'pi pi-fw pi-heart', to: '/uikit/FamilyPlanningAdmission' },
-            { label: 'Patient', icon: 'pi pi-fw pi-users', to: '/uikit/Patient' },
             { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff' },
             { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards' },
             { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service' },
-            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard' }
+            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard' },
+            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain' }
 
             /*{ label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
             { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
