@@ -16,7 +16,8 @@ const model = ref([
             { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards' },
             { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service' },
             { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard' },
-            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain' }
+            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain' },
+            { label: 'User Account', icon: 'pi pi-fw pi-users', to: '/uikit/UserAccount' }
 
             /*{ label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
             { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },

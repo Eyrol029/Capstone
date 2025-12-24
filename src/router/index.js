@@ -24,6 +24,11 @@ const router = createRouter({
                     component: () => import('@/views/uikit/FamilyPlanningAdmission.vue')
                 },
                 {
+                path: '/uikit/UserAccountPatient',
+                name: 'UserAccountPatient',
+                component: () => import('@/views/uikit/UserAccountPatient.vue')
+                },
+                {
                     path: '/uikit/Patient',
                     name: 'Patient',
                     component: () => import('@/views/uikit/Patient.vue')
@@ -112,7 +117,12 @@ const router = createRouter({
                     path: '/uikit/PaymentDashboard',
                     name: 'PaymentDashboard',
                     component: () => import('@/views/uikit/PaymentDashboard.vue')
-                }
+                },
+                {
+                    path: '/uikit/UserAccount',
+                    name: 'UserAccount',
+                    component: () => import('@/views/uikit/UserAccount.vue')
+                },
             ]
         },
         {
