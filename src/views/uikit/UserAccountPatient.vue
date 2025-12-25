@@ -308,9 +308,11 @@ function handleDeleteUser(id) {
             <input v-model="searchQuery" type="text" placeholder="Search users..." class="w-64 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500" />
             <button v-if="searchQuery" @click="clearSearch" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">✕</button>
           </div>
-
+          <div class="flex items-center gap-2">
           <button @click="$router.push('/uikit/UserAccount')" class="px-3 py-2 rounded bg-teal-100 text-teal-700 hover:bg-teal-200">Employees</button>
           <button @click="$router.push('/uikit/UserAccountPatient')" class="px-3 py-2 rounded bg-teal-100 text-teal-700 hover:bg-teal-200">Patients</button>
+          </div>
+      
 
           <button @click="openAddForm()" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2">+ Add User</button>
         </div>
