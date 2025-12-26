@@ -25,18 +25,6 @@ const patients = ref([
         name: 'Althea Mae Santos',
         contactNo: '0917 123 4567',
         email: 'sampleEmail.com'
-    },
-    {
-        id: 'P002',
-        name: 'Maria Cruz',
-        contactNo: '0918 234 5678',
-        email: 'maria.cruz@email.com'
-    },
-    {
-        id: 'P003',
-        name: 'Rosa Mendoza',
-        contactNo: '0919 345 6789',
-        email: 'rosa.mendoza@email.com'
     }
 ]);
 
@@ -51,9 +39,6 @@ const filteredPatients = computed(() => {
     );
 });
 
-function viewPatient(patient) {
-    alert(`Viewing patient: ${patient.name}`);
-}
 
 function handleAdmission() {
     alert('Opening Admission form...');
@@ -168,12 +153,8 @@ function deletePatient(patient) {
                         <td class="px-6 py-4">
                             <div class="flex gap-2">
                                 <button
-                                    @click="viewPatient(patient)"
-                                    class="px-4 py-1 bg-purple-200 text-gray-800 rounded hover:bg-purple-300 text-sm"
-                                >
-                                    View
-                                </button>
-                                <button
+                                  @click="$router.push('/uikit/PatientProfiling')"
+                                    class="px-4 py-1 bg-purple-200 text-gray-800 rounded hover:bg-purple-300 text-sm">View</button><button
                                     @click="deletePatient(patient)"
                                     class="px-4 py-1 bg-red-200 text-gray-800 rounded hover:bg-red-300 text-sm"
                                 >

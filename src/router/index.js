@@ -24,9 +24,9 @@ const router = createRouter({
                     component: () => import('@/views/uikit/FamilyPlanningAdmission.vue')
                 },
                 {
-                path: '/uikit/UserAccountPatient',
-                name: 'UserAccountPatient',
-                component: () => import('@/views/uikit/UserAccountPatient.vue')
+                    path: '/uikit/UserAccountPatient',
+                    name: 'UserAccountPatient',
+                    component: () => import('@/views/uikit/UserAccountPatient.vue')
                 },
                 {
                     path: '/uikit/Patient',
@@ -123,6 +123,21 @@ const router = createRouter({
                     name: 'UserAccount',
                     component: () => import('@/views/uikit/UserAccount.vue')
                 },
+                {
+                    path: '/uikit/PatientProfiling',
+                    name: 'PatientProfiling',
+                    component: () => import('@/views/uikit/PatientProfiling.vue')
+                },
+                {
+                    path: '/uikit/PaymentDetails',
+                    name: 'PaymentDetails',
+                    component: () => import('@/views/uikit/PaymentDetails.vue')
+                },
+                {
+                    path: '/uikit/patientIndividual',
+                    name: 'patientIndividual',
+                    component: () => import('@/views/uikit/PatientIndividual.vue')
+                }
             ]
         },
         {
@@ -160,11 +175,6 @@ const router = createRouter({
             path: '/uikit/Summary',
             name: 'Summary',
             component: () => import('@/views/uikit/PaymentDashboard.vue')
-        },
-        {
-            path: '/uikit/PaymentDetails',
-            name: 'PaymentDetails',
-            component: () => import('@/views/uikit/PaymentDetails.vue')
         }
     ]
 });
