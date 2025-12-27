@@ -97,8 +97,18 @@ const router = createRouter({
                     path: '/uikit/Summary',
                     name: 'Summary',
                     omponent: () => import('@/views/uikit/PaymentDashboard.vue')
+                },
+                {
+                    path: '/uikit/Admission',
+                    name: 'Admission',
+                    component: () => import('@/views/uikit/Admission.vue')
                 }
             ]
+        },
+        {
+            path: '/uikit/Login',
+            name: 'Login',
+            component: () => import('@/views/uikit/Login.vue')
         }
     ]
 });

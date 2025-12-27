@@ -1,188 +1,159 @@
-<template>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Healthcare System Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-<body>
-<div id="app">
-  <div class="login-container">
-    <h1>Healthcare System</h1>
-    <p class="subtitle">Select role and login</p>
+const router = useRouter()
 
-    <div v-if="error" class="error">{{ error }}</div>
+const role = ref('admin')
+const username = ref('')
+const password = ref('')
+const error = ref('')
 
-    <!-- USER TYPE -->
-    <div class="user-type-grid">
-      <div
-        class="user-card"
-        :class="{ active: role === 'admin' }"
-        @click="role = 'admin'"
-      >Admin</div>
-
-      <div
-        class="user-card"
-        :class="{ active: role === 'midwife' }"
-        @click="role = 'midwife'"
-      >Midwife</div>
-
-      <div
-        class="user-card"
-        :class="{ active: role === 'doctor' }"
-        @click="role = 'doctor'"
-      >Doctor</div>
-
-      <div
-        class="user-card"
-        :class="{ active: role === 'patient' }"
-        @click="role = 'patient'"
-      >Patient</div>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" v-model="username">
-    </div>
-
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" v-model="password">
-    </div>
-
-    <button @click="login">Login</button>
-  </div>
-</div>
-
-<script>
-const { createApp } = Vue;
-
-createApp({
-  data() {
-    return {
-      role: 'admin',
-      username: '',
-      password: '',
-      error: ''
-    };
-  },
-  methods: {
-    login() {
-      this.error = '';
-
-      if (!this.username || !this.password) {
-        this.error = 'Please enter both username and password.';
-        return;
-      }
-
-      // Simulate login process
-      alert(`Logging in as ${this.role} with username: ${this.username}`);
+// HARD-CODED USERS
+const users = {
+    admin: {
+        username: 'admin@gmail.com',
+        password: 'admin123'
+    },
+    midwife: {
+        username: 'midwife@gmail.com',
+        password: 'midwife123'
+    },
+    'ob-gyne': {
+        username: 'obgyne@gmail.com',
+        password: 'obgyne123'
+    },
+    patient: {
+        username: 'patient@gmail.com',
+        password: 'patient123'
     }
-  }
-}).mount('#app');
+}
+
+function selectRole(selectedRole) {
+    role.value = selectedRole
+    error.value = ''
+}
+
+function login() {
+    error.value = ''
+
+    if (!username.value || !password.value) {
+        error.value = 'Please enter both username and password.'
+        return
+    }
+
+    const user = users[role.value]
+
+    if (
+        user &&
+        username.value === user.username &&
+        password.value === user.password
+    ) {
+        switch (role.value) {
+            case 'admin':
+                router.push({ name: 'AdminDashboard' })
+                break
+            case 'midwife':
+                router.push({ name: 'MidwifeDashboard' })
+                break
+            case 'ob-gyne':
+                router.push({ name: 'ObGyneDashboard' })
+                break
+            case 'patient':
+                router.push({ name: 'PatientDashboard' })
+                break
+        }
+    } else {
+        error.value = 'Invalid username or password.'
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') login()
+}
 </script>
 
-</body>
-</html>
+<template>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#8e4f70] to-[#6f3c58] p-6">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">
+                Tating's Birthing Home
+            </h1>
+            <p class="text-center text-gray-600 mb-6">
+                Select role and login
+            </p>
+
+            <!-- ERROR MESSAGE -->
+            <div v-if="error" class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4">
+                {{ error }}
+            </div>
+
+            <!-- ROLE SELECTION -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div
+                    v-for="r in ['admin', 'midwife', 'ob-gyne', 'patient']"
+                    :key="r"
+                    @click="selectRole(r)"
+                    :class="[
+                        'cursor-pointer border-2 rounded-xl p-4 text-center transition-all',
+                        role === r
+                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700 font-semibold'
+                            : 'border-gray-300 hover:border-indigo-300'
+                    ]"
+                >
+                    {{ r.toUpperCase() }}
+                </div>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Username</label>
+                    <input
+                        v-model="username"
+                        type="text"
+                        placeholder="Enter username"
+                        @keypress="handleKeyPress"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Password</label>
+                    <input
+                        v-model="password"
+                        type="password"
+                        placeholder="Enter password"
+                        @keypress="handleKeyPress"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    />
+                </div>
+
+                <button
+                    @click="login"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition"
+                >
+                    Login
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+<style scoped>
 .login-container {
-  width: 420px;
-  background: #fff;
-  border-radius: 14px;
-  padding: 30px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    animation: fadeIn 0.4s ease-in;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-p.subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 25px;
-}
-
-.user-type-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.user-card {
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.user-card.active {
-  border-color: #667eea;
-  background: #eef2ff;
-}
-
-.user-card:hover {
-  border-color: #667eea;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: #667eea;
-  border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #5a67d8;
-}
-
-.error {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 15px;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

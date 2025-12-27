@@ -34,7 +34,7 @@ const { toggleMenu } = useLayout();
                         <span>Profile</span>
                     </button>
 
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" @click="$router.push('/uikit/Login')">
                         <i class="pi pi-sign-out"></i>
                         <span>Logout</span>
                     </button>

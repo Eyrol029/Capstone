@@ -113,7 +113,7 @@ function deletePatient(patient) {
                 class="flex-1 px-4 py-2 bg-gray-100 border-0 rounded-full focus:ring-2 focus:ring-purple-500 focus:bg-white"
             />
             <button
-                @click="handleAdmission"
+                @click="$router.push('/uikit/Admission')"
                 class="px-6 py-2 bg-purple-700 text-white rounded-full hover:bg-purple-800 transition-colors"
             >
                 Admission
@@ -153,7 +153,7 @@ function deletePatient(patient) {
                         <td class="px-6 py-4">
                             <div class="flex gap-2">
                                 <button
-                                  @click="$router.push('/uikit/PatientProfiling')"
+                                @click="$router.push('/uikit/PatientProfiling')"
                                     class="px-4 py-1 bg-purple-200 text-gray-800 rounded hover:bg-purple-300 text-sm">View</button><button
                                     @click="deletePatient(patient)"
                                     class="px-4 py-1 bg-red-200 text-gray-800 rounded hover:bg-red-300 text-sm"
