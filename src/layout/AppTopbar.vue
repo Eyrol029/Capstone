@@ -33,6 +33,11 @@ const { toggleMenu } = useLayout();
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
+
+                    <button type="button" class="layout-topbar-action">
+                        <i class="pi pi-sign-out"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
         </div>

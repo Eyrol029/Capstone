@@ -74,9 +74,6 @@ function deleteAppointment() {
     selectedAppointment.value = null;
 }
 
-function updateStatus(appointment, newStatus) {
-    appointment.status = newStatus;
-}
 
 function getStatusClass(status) {
     switch (status) {

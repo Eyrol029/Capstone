@@ -10,8 +10,6 @@ const model = ref([
     {
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Prenatal Admission', icon: 'pi pi-fw pi-id-card', to: '/uikit/PrenatalAdmission' },
-            { label: 'Family Planning Admission', icon: 'pi pi-fw pi-heart', to: '/uikit/FamilyPlanningAdmission' },
             { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff' },
             { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards' },
             { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service' },
