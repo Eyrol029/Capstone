@@ -1,82 +1,76 @@
-<script setup>
-import { ref } from 'vue';
-
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useUserDataStore, UserRole } from '@/stores/userData';
 import AppMenuItem from './AppMenuItem.vue';
 
-const model = ref([
+// Access user store
+const userStore = useUserDataStore();
+const loggedInUser = computed(() => userStore.user);
+
+// Menu model with roles
+const model = [
     {
-        label: 'Home'
+        label: 'Home',
+        roles: [UserRole.ADMIN, UserRole.MIDWIFE, UserRole.OBGYNE, UserRole.PATIENT]
     },
     {
         items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff' },
-            { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards' },
-            { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service' },
-            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard' },
-            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain' },
-            { label: 'User Account', icon: 'pi pi-fw pi-users', to: '/uikit/UserAccount' },
-            { label: 'Prenatal', icon: 'pi pi-fw pi-file-edit', to: '/uikit/PrenatalAdmission' }
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', roles: [UserRole.ADMIN] },
+            { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff', roles: [UserRole.ADMIN] },
+            { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards', roles: [UserRole.ADMIN] },
+            { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service', roles: [UserRole.ADMIN, UserRole.MIDWIFE, UserRole.OBGYNE] },
+            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard', roles: [UserRole.ADMIN] },
+            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain', roles: [UserRole.ADMIN, UserRole.MIDWIFE, UserRole.OBGYNE] },
+            { label: 'User Account', icon: 'pi pi-fw pi-users', to: '/uikit/UserAccount', roles: [UserRole.ADMIN] },
+            { label: 'Prenatal', icon: 'pi pi-fw pi-file-edit', to: '/uikit/PrenatalAdmission', roles: [UserRole.MIDWIFE] },
+            { label: 'Logs', icon: 'pi pi-fw pi-home', to: '/uikit/Logs', roles: [UserRole.ADMIN] },
+            { label: 'Appointments', icon: 'pi pi-fw pi-calendar', to: '/uikit/ManageApp', roles: [UserRole.ADMIN] },
+            { label: 'Patient Dashboard', icon: 'pi pi-fw pi-user', to: '/uikit/PatientDashboard', roles: [UserRole.PATIENT] },
+            { label: 'Create Appointment', icon: 'pi pi-fw pi-calendar-plus', to: '/uikit/PatientCreateAppointment', roles: [UserRole.PATIENT] },
+            { label: 'Clinic Services', icon: 'pi pi-fw pi-book', to: '/uikit/PatientService', roles: [UserRole.PATIENT] },
+            { label: 'My Services and Appointments', icon: 'pi pi-fw pi-list', to: '/uikit/MyServicesAndAppointment', roles: [UserRole.PATIENT] },
+            { label: 'Payment History', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentHistory', roles: [UserRole.PATIENT] }
+        ]
+    }
+];
 
-            /*{ label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-            { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-            { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-            { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-            { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-            { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-            { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' },
-            { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-            { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-            { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-            { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/uikit/timeline' },
-            { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' }
-            */
-        ]
-    }
-    /*{
-        label: 'Pages',
-        icon: 'pi pi-fw pi-briefcase',
-        to: '/pages',
-        items: [
-            {
-                label: 'Auth',
-                icon: 'pi pi-fw pi-user',
-                items: [
-                    {
-                        label: 'Login',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/auth/login'
-                    },
-                    {
-                        label: 'Error',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/auth/error'
-                    },
-                    {
-                        label: 'Access Denied',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/auth/access'
-                    }
-                ]
-            },
-            {
-                label: 'Crud',
-                icon: 'pi pi-fw pi-pencil',
-                to: '/pages/crud'
-            }
-        ]
-    }
-    */
-]);
+// Filter model based on logged-in user's role
+const filteredModel = computed(() => {
+    if (!loggedInUser.value) return [];
+
+    return model.map(section => {
+        if (section.items) {
+            const filteredItems = section.items.filter(item =>
+                !item.roles || item.roles.includes(loggedInUser.value.role)
+            )
+            return { ...section, items: filteredItems }
+        }
+        if (!section.roles || section.roles.includes(loggedInUser.value.role)) {
+            return section
+        }
+        return null;
+    }).filter(Boolean);
+});
 </script>
 
 <template>
-    <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
-        </template>
-    </ul>
+  <ul class="layout-menu">
+    <template v-for="(item, i) in filteredModel" :key="i">
+      <app-menu-item :item="item" :index="i"></app-menu-item>
+    </template>
+  </ul>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.layout-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: #ccc;
+  margin: 0.5rem 0;
+}
+</style>

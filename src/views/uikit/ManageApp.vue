@@ -73,8 +73,6 @@ function deleteAppointment() {
     showDeleteConfirm.value = false;
     selectedAppointment.value = null;
 }
-
-
 function getStatusClass(status) {
     switch (status) {
         case 'Completed':
