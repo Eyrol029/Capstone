@@ -43,7 +43,8 @@ const routes = [
             { path: 'uikit/PatientDashboard', component: () => import('@/views/Dashboard/PatientDashboard.vue') },
             { path: 'uikit/PatientService', component: () => import('@/views/uikit/PatientService.vue') },
             { path: 'uikit/MyServicesAndAppointment', component: () => import('@/views/uikit/MyServicesAndAppointment.vue') },
-            { path: 'uikit/PaymentHistory', component: () => import('@/views/uikit/PaymentHistory.vue') }
+            { path: 'uikit/PaymentHistory', component: () => import('@/views/uikit/PaymentHistory.vue') },
+            { path: 'uikit/ObgyneView2', component: () => import('@/views/uikit/ObgyneView2.vue') }
         ]
     },
 

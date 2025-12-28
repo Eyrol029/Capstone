@@ -16,20 +16,21 @@ const model = [
     {
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', roles: [UserRole.ADMIN] },
-            { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff', roles: [UserRole.ADMIN] },
-            { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards', roles: [UserRole.ADMIN] },
-            { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service', roles: [UserRole.ADMIN, UserRole.MIDWIFE, UserRole.OBGYNE] },
+            { label: 'Staff', icon: 'pi pi-fw pi-user', to: '/uikit/Staff', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
+            { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
+            { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard', roles: [UserRole.ADMIN] },
-            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain', roles: [UserRole.ADMIN, UserRole.MIDWIFE, UserRole.OBGYNE] },
+            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'User Account', icon: 'pi pi-fw pi-users', to: '/uikit/UserAccount', roles: [UserRole.ADMIN] },
             { label: 'Prenatal', icon: 'pi pi-fw pi-file-edit', to: '/uikit/PrenatalAdmission', roles: [UserRole.MIDWIFE] },
-            { label: 'Logs', icon: 'pi pi-fw pi-home', to: '/uikit/Logs', roles: [UserRole.ADMIN] },
-            { label: 'Appointments', icon: 'pi pi-fw pi-calendar', to: '/uikit/ManageApp', roles: [UserRole.ADMIN] },
+            { label: 'Logs', icon: 'pi pi-fw pi-home', to: '/uikit/Logs', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
+            { label: 'Appointments', icon: 'pi pi-fw pi-calendar', to: '/uikit/ManageApp', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Patient Dashboard', icon: 'pi pi-fw pi-user', to: '/uikit/PatientDashboard', roles: [UserRole.PATIENT] },
             { label: 'Create Appointment', icon: 'pi pi-fw pi-calendar-plus', to: '/uikit/PatientCreateAppointment', roles: [UserRole.PATIENT] },
             { label: 'Clinic Services', icon: 'pi pi-fw pi-book', to: '/uikit/PatientService', roles: [UserRole.PATIENT] },
             { label: 'My Services and Appointments', icon: 'pi pi-fw pi-list', to: '/uikit/MyServicesAndAppointment', roles: [UserRole.PATIENT] },
-            { label: 'Payment History', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentHistory', roles: [UserRole.PATIENT] }
+            { label: 'Payment History', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentHistory', roles: [UserRole.PATIENT] },
+            { label: 'List Of Patients', icon: 'pi pi-fw pi-eye', to: '/uikit/ObgyneView2', roles: [UserRole.OBGYNE] }
         ]
     }
 ];

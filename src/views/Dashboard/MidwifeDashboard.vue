@@ -1,189 +1,326 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const dateFilter = ref('Today');
-const customStartDate = ref('');
-const customEndDate = ref('');
+const view = ref('list');
+const selectedEmployee = ref(null);
+const searchQuery = ref('');
 
-// Stats data
-const stats = {
-    totalPatients: 504,
-    totalDeliveries: 301,
-    availableWards: 3,
-    totalAppointments: 102
-};
+const employees = ref([
+    {
+        id: 'E001',
+        name: 'Dr. Carmen Reyes',
+        position: 'Obstetrician',
+        department: 'Maternity',
+        contact: '09123456789',
+        email: 'carmen.reyes@clinic.com',
+        dateHired: '2020-01-15',
+        salary: 50000,
+        status: 'Active'
+    },
+    {
+        id: 'E002',
+        name: 'Nurse Elena Santos',
+        position: 'Registered Nurse',
+        department: 'Maternity',
+        contact: '09234567890',
+        email: 'elena.santos@clinic.com',
+        dateHired: '2021-03-20',
+        salary: 25000,
+        status: 'Active'
+    },
+    {
+        id: 'E003',
+        name: 'Maria Cruz',
+        position: 'Midwife',
+        department: 'Family Planning',
+        contact: '09345678901',
+        email: 'maria.cruz@clinic.com',
+        dateHired: '2019-07-10',
+        salary: 22000,
+        status: 'Active'
+    }
+]);
 
-// Recent activities
-const recentActivities = [
-    { text: 'New patient Maria Santos registered', time: '5 minutes ago' },
-    { text: 'Prenatal checkup record updated', time: '1 hour ago' },
-    { text: 'Monthly prenatal report generated', time: '2 hours ago' },
-    { text: 'Ward 2 occupancy updated', time: '3 hours ago' },
-    { text: 'Payment received paid by GH Prep', time: '4 hours ago' }
-];
+const formData = ref({
+    name: '',
+    position: '',
+    department: 'Maternity',
+    contact: '',
+    email: '',
+    salary: '',
+    status: 'Active'
+});
 
-// Pending requests
-const pendingRequests = [
-    { type: 'Admission Request', name: 'Ana Cruz', subtitle: 'Family Planning Consultation', status: 'Pending' },
-    { type: 'Supply Request', name: 'Medical Supplies', subtitle: 'Maternity Department', status: 'Pending' },
-    { type: 'Appointment Request', name: 'Rosa Mendoza', subtitle: 'Maternity Checkup', status: 'Pending' }
-];
+const filteredEmployees = computed(() => {
+    const query = searchQuery.value.toLowerCase();
+    return employees.value.filter((e) => e.name.toLowerCase().includes(query) || e.id.toLowerCase().includes(query) || e.position.toLowerCase().includes(query));
+});
 
-// Financial data
-const financial = {
-    totalRevenue: 125450.0,
-    totalExpenses: 48230.0,
-    netIncome: 77220.0
-};
+function handleAddEmployee() {
+    const newEmployee = {
+        id: `E${String(employees.value.length + 1).padStart(3, '0')}`,
+        name: formData.value.name,
+        position: formData.value.position,
+        department: formData.value.department,
+        contact: formData.value.contact,
+        email: formData.value.email,
+        dateHired: new Date().toISOString().split('T')[0],
+        salary: parseFloat(formData.value.salary),
+        status: formData.value.status
+    };
+    employees.value.push(newEmployee);
+    resetForm();
+    view.value = 'list';
+}
 
-function generateReport() {
-    alert('Generating report...');
+function handleEditEmployee() {
+    if (!selectedEmployee.value) return;
+    const index = employees.value.findIndex((e) => e.id === selectedEmployee.value.id);
+    if (index !== -1) {
+        employees.value[index] = {
+            ...selectedEmployee.value,
+            name: formData.value.name,
+            position: formData.value.position,
+            department: formData.value.department,
+            contact: formData.value.contact,
+            email: formData.value.email,
+            salary: parseFloat(formData.value.salary),
+            status: formData.value.status
+        };
+    }
+    resetForm();
+    view.value = 'list';
+}
+
+function handleDeleteEmployee(employeeId) {
+    if (confirm('Are you sure you want to delete this employee record?')) {
+        employees.value = employees.value.filter((e) => e.id !== employeeId);
+    }
+}
+
+function resetForm() {
+    formData.value = {
+        name: '',
+        position: '',
+        department: 'Maternity',
+        contact: '',
+        email: '',
+        salary: '',
+        status: 'Active'
+    };
+    selectedEmployee.value = null;
+}
+
+function openEditForm(employee) {
+    selectedEmployee.value = employee;
+    formData.value = {
+        name: employee.name,
+        position: employee.position,
+        department: employee.department,
+        contact: employee.contact,
+        email: employee.email,
+        salary: employee.salary.toString(),
+        status: employee.status
+    };
+    view.value = 'edit';
+}
+
+function viewEmployeeDetail(employee) {
+    selectedEmployee.value = employee;
+    view.value = 'detail';
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString();
 }
 </script>
 
 <template>
-    <div class="p-6 bg-gray-100 min-h-screen">
-        <!-- Header -->
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Welcome to the Dashboard</h1>
-                <p class="text-gray-600 text-sm mt-1">Overview of clinic operations and key metrics</p>
-            </div>
-
-            <!-- Filter Section -->
-            <div class="bg-white rounded-lg shadow p-4 w-90">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-gray-700 font-semibold">📅 Filter By Date</span>
-                </div>
-                <div class="flex gap-2 mb-3">
-                    <button @click="dateFilter = 'Today'" :class="['px-4 py-2 rounded text-sm', dateFilter === 'Today' ? 'bg-[#8e4f70] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#8e4f70] hover:text-white']">Today</button>
-                    <button @click="dateFilter = 'Last 7 days'" :class="['px-4 py-2 rounded text-sm', dateFilter === 'Last 7 days' ? 'bg-[#8e4f70] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#8e4f70] hover:text-white']">Last 7 days</button>
-                    <button @click="dateFilter = 'This Month'" :class="['px-4 py-2 rounded text-sm', dateFilter === 'This Month' ? 'bg-[#8e4f70] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#8e4f70] hover:text-white']">This Month</button>
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-2">Custom</label>
-                    <div class="flex gap-2">
-                        <input v-model="customStartDate" type="date" class="flex-1 px-3 py-2 border rounded text-sm" placeholder="Start Date" />
-                        <input v-model="customEndDate" type="date" class="flex-1 px-3 py-2 border rounded text-sm" placeholder="End Date" />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Generate Report Button -->
-        <div class="flex justify-end mb-6">
-            <button @click="generateReport" class="px-6 py-2 bg-[#8e4f70] text-white rounded-lg hover:bg-purple-500">Generate Report</button>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <!-- Total Patients -->
+    <div class="space-y-6 p-6 bg-white min-h-screen">
+        <div v-if="view === 'add' || view === 'edit'" class="max-w-2xl">
             <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 text-xl">👤</span>
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                    {{ view === 'add' ? 'Add New Employee' : 'Edit Employee Details' }}
+                </h3>
+                <form @submit.prevent="view === 'add' ? handleAddEmployee() : handleEditEmployee()" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                        <input v-model="formData.name" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
                     </div>
-                    <span class="text-gray-600 text-sm">Total Patients</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-800">{{ stats.totalPatients }}</div>
-            </div>
-
-            <!-- Total Deliveries -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 text-xl">👶</span>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Position *</label>
+                            <input v-model="formData.position" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Department *</label>
+                            <select v-model="formData.department" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                <option>Maternity</option>
+                                <option>Family Planning</option>
+                                <option>Administration</option>
+                                <option>Finance</option>
+                            </select>
+                        </div>
                     </div>
-                    <span class="text-gray-600 text-sm">Total Deliveries</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-800">{{ stats.totalDeliveries }}</div>
-            </div>
-
-            <!-- Available Wards -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 text-xl">🏥</span>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Contact Number *</label>
+                        <input v-model="formData.contact" type="tel" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
                     </div>
-                    <span class="text-gray-600 text-sm">Available Wards</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-800">{{ stats.availableWards }}</div>
-            </div>
-
-            <!-- Total Appointments -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 text-xl">📅</span>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
+                        <input v-model="formData.email" type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
                     </div>
-                    <span class="text-gray-600 text-sm">Total Appointment</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-800">{{ stats.totalAppointments }}</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Monthly Salary (₱) *</label>
+                            <input v-model="formData.salary" type="number" step="0.01" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
+                            <select v-model="formData.status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                <option>Active</option>
+                                <option>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+                            {{ view === 'add' ? 'Add Employee' : 'Save Changes' }}
+                        </button>
+                        <button
+                            type="button"
+                            @click="
+                                resetForm();
+                                view = 'list';
+                            "
+                            class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- Recent Activity & Pending Requests -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- Recent Activity -->
+        <div v-else-if="view === 'detail' && selectedEmployee" class="max-w-3xl">
             <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-xl">📊</span>
-                    <h3 class="font-bold text-gray-800">Recent Activity</h3>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Employee Details</h3>
+                    <button @click="view = 'list'" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
                 </div>
                 <div class="space-y-4">
-                    <div v-for="(activity, index) in recentActivities" :key="index" class="flex items-start gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                        <div class="flex-1">
-                            <p class="text-gray-800 text-sm">{{ activity.text }}</p>
-                            <p class="text-gray-500 text-xs">{{ activity.time }}</p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Employee ID</p>
+                            <p class="text-gray-900 mt-1">{{ selectedEmployee.id }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Date Hired</p>
+                            <p class="text-gray-900 mt-1">{{ formatDate(selectedEmployee.dateHired) }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500">Full Name</p>
+                        <p class="text-gray-900 mt-1">{{ selectedEmployee.name }}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Position</p>
+                            <p class="text-gray-900 mt-1">{{ selectedEmployee.position }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Department</p>
+                            <p class="text-gray-900 mt-1">{{ selectedEmployee.department }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Contact Number</p>
+                            <p class="text-gray-900 mt-1">{{ selectedEmployee.contact }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Email Address</p>
+                            <p class="text-gray-900 mt-1">{{ selectedEmployee.email }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Monthly Salary</p>
+                            <p class="text-gray-900 mt-1">₱{{ selectedEmployee.salary.toLocaleString() }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-500">Status</p>
+                            <span :class="['inline-block px-2 py-1 rounded text-xs mt-1', selectedEmployee.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700']">
+                                {{ selectedEmployee.status }}
+                            </span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Pending Requests -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-xl">📈</span>
-                    <h3 class="font-bold text-gray-800">Pending Requests</h3>
-                </div>
-                <div class="space-y-4">
-                    <div v-for="(request, index) in pendingRequests" :key="index" class="bg-purple-50 rounded-lg p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="text-xs text-gray-600">{{ request.type }}</p>
-                                <p class="font-bold text-gray-800">{{ request.name }}</p>
-                            </div>
-                            <span class="px-3 py-1 bg-yellow-400 text-yellow-900 text-xs rounded-full">{{ request.status }}</span>
-                        </div>
-                        <p class="text-xs text-gray-600">{{ request.subtitle }}</p>
-                    </div>
+                <div class="flex gap-3 mt-6 pt-6 border-t">
+                    <button @click="openEditForm(selectedEmployee)" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">Edit Details</button>
+                    <button @click="view = 'list'" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Back to List</button>
                 </div>
             </div>
         </div>
 
-        <!-- Financial Overview -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">📊</span>
-                    <h3 class="font-bold text-gray-800">Financial Overview - This Month</h3>
+        <template v-else>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Employee Management</h3>
+                    <p class="text-gray-600 text-sm mt-1">Manage employee records and information</p>
                 </div>
-                <button class="text-orange-500 text-sm font-semibold flex items-center gap-2">View Details →</button>
+                <button @click="view = 'add'" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2">
+                    <span class="text-xl">+</span>
+                    Add Employee
+                </button>
             </div>
-            <div class="grid grid-cols-3 gap-8">
-                <div>
-                    <p class="text-gray-600 text-sm mb-2">Total Revenue</p>
-                    <p class="text-2xl font-bold text-orange-500">₱{{ financial.totalRevenue.toLocaleString() }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-600 text-sm mb-2">Total Expenses</p>
-                    <p class="text-2xl font-bold text-red-500">₱{{ financial.totalExpenses.toLocaleString() }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-600 text-sm mb-2">Net Income</p>
-                    <p class="text-2xl font-bold text-green-600">₱{{ financial.netIncome.toLocaleString() }}</p>
+
+            <div class="bg-white rounded-lg shadow p-4">
+                <input v-model="searchQuery" type="text" placeholder="Search by name, ID, or position..." class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+            </div>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Position</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Department</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Contact</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr v-for="employee in filteredEmployees" :key="employee.id" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ employee.id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ employee.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ employee.position }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ employee.department }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ employee.contact }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span :class="['px-2 py-1 rounded text-xs', employee.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700']">
+                                        {{ employee.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex gap-2">
+                                        <button @click="viewEmployeeDetail(employee)" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">View</button>
+                                        <button @click="openEditForm(employee)" class="px-3 py-1 bg-teal-600 text-white rounded text-sm hover:bg-teal-700">Edit</button>
+                                        <button @click="handleDeleteEmployee(employee.id)" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+
+            <div v-if="filteredEmployees.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
+                <p class="text-gray-600">No employees found</p>
+            </div>
+        </template>
     </div>
 </template>
