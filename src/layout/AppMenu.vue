@@ -20,9 +20,8 @@ const model = [
             { label: 'Wards', icon: 'pi pi-fw pi-warehouse', to: '/uikit/Wards', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Service', icon: 'pi pi-fw pi-book', to: '/uikit/Service', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentDashboard', roles: [UserRole.ADMIN] },
-            { label: 'Patients Main', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
+            { label: 'List of Patients', icon: 'pi pi-fw pi-chart-line', to: '/uikit/PatientsMain', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'User Account', icon: 'pi pi-fw pi-users', to: '/uikit/UserAccount', roles: [UserRole.ADMIN] },
-            { label: 'Prenatal', icon: 'pi pi-fw pi-file-edit', to: '/uikit/PrenatalAdmission', roles: [UserRole.MIDWIFE] },
             { label: 'Logs', icon: 'pi pi-fw pi-home', to: '/uikit/Logs', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Appointments', icon: 'pi pi-fw pi-calendar', to: '/uikit/ManageApp', roles: [UserRole.ADMIN, UserRole.MIDWIFE] },
             { label: 'Patient Dashboard', icon: 'pi pi-fw pi-user', to: '/uikit/PatientDashboard', roles: [UserRole.PATIENT] },
@@ -30,11 +29,11 @@ const model = [
             { label: 'Clinic Services', icon: 'pi pi-fw pi-book', to: '/uikit/PatientService', roles: [UserRole.PATIENT] },
             { label: 'My Services and Appointments', icon: 'pi pi-fw pi-list', to: '/uikit/MyServicesAndAppointment', roles: [UserRole.PATIENT] },
             { label: 'Payment History', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentHistory', roles: [UserRole.PATIENT] },
-            { label: 'List Of Patients', icon: 'pi pi-fw pi-eye', to: '/uikit/ObgyneView2', roles: [UserRole.OBGYNE] }
-        ]
+            { label: 'List Of Patients', icon: 'pi pi-fw pi-eye', to: '/uikit/ObgyneView2', roles: [UserRole.OBGYNE] },
+            { label: 'Familyplanning', icon: 'pi pi-fw pi-calendar', to: '/uikit/FamilyPlanningAdmission', roles: [UserRole.ADMIN, UserRole.MIDWIFE] }
+        ]   
     }
 ];
-
 // Filter model based on logged-in user's role
 const filteredModel = computed(() => {
     if (!loggedInUser.value) return [];

@@ -168,7 +168,7 @@ function generateReport() {
                     <span class="text-xl">📊</span>
                     <h3 class="font-bold text-gray-800">Financial Overview - This Month</h3>
                 </div>
-                <button class="text-orange-500 text-sm font-semibold flex items-center gap-2">View Details →</button>
+                <button @click="$router.push('/uikit/PaymentDashboard')" class="text-orange-500 text-sm font-semibold flex items-center gap-2">View Details →</button>
             </div>
             <div class="grid grid-cols-3 gap-8">
                 <div>

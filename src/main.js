@@ -11,9 +11,9 @@ import ToastService from 'primevue/toastservice';
 import '@/assets/styles.scss';
 
 const app = createApp(App);
-const pinia = createPinia();
-app.use(pinia);
-app.use(router);
+const pinia = createPinia()
+app.use(pinia)
+app.use(router)
 
 app.use(router);
 app.use(PrimeVue, {

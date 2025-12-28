@@ -44,7 +44,10 @@ const routes = [
             { path: 'uikit/PatientService', component: () => import('@/views/uikit/PatientService.vue') },
             { path: 'uikit/MyServicesAndAppointment', component: () => import('@/views/uikit/MyServicesAndAppointment.vue') },
             { path: 'uikit/PaymentHistory', component: () => import('@/views/uikit/PaymentHistory.vue') },
-            { path: 'uikit/ObgyneView2', component: () => import('@/views/uikit/ObgyneView2.vue') }
+            { path: 'uikit/ObgyneView2', component: () => import('@/views/uikit/ObgyneView2.vue') },
+            { path: 'uikit/viewListOfExpense', component: () => import('@/views/uikit/viewListOfExpense.vue') },
+            { path: 'uikit/viewListOfRevenue', component: () => import('@/views/uikit/viewListOfRevenue.vue') },
+            { path: 'uikit/viewListOfSOA', component: () => import('@/views/uikit/viewListOfSOA.vue') }
         ]
     },
 
@@ -62,9 +65,6 @@ const router = createRouter({
     routes
 });
 
-/* =======================
-ROUTE GUARD
-======================= */
 router.beforeEach((to, from, next) => {
     const userStore = useUserDataStore();
     userStore.hydrate?.();

@@ -40,10 +40,6 @@ const filteredPatients = computed(() => {
 });
 
 
-function handleAdmission() {
-    alert('Opening Admission form...');
-}
-
 function addPatient() {
     showAddPatientModal.value = true;
 }

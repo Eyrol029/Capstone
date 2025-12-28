@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const searchQuery = ref('');
 const statusFilter = ref('all');
@@ -150,26 +149,43 @@ function getStatusBg(status) {
             return 'bg-red-100 text-red-700';
     }
 }
-
-const router = useRouter();
-
-function viewPaymentDetails(patient) {
-    // store a fallback in localStorage and pass patient via query
-    try {
-        localStorage.setItem('payment_patient', JSON.stringify(patient));
-    } catch (e) {
-        // ignore storage errors
-    }
-
-    router.push({
-        name: 'PaymentDetails',
-        query: { patient: JSON.stringify(patient) }
-    });
-}
 </script>
 
 <template>
     <div class="space-y-6 p-6 bg-white min-h-screen">
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <button
+                @click="$router.push('/uikit/viewListOfExpense')"
+                class="bg-white border-2 border-purple-500 text-purple-700 px-6 py-4 rounded-lg font-semibold hover:bg-purple-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                </svg>
+                View List of Expenses
+            </button>
+
+            <button
+                @click="$router.push('/uikit/viewListOfRevenue')"
+                class="bg-white border-2 border-green-500 text-green-700 px-6 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                View List of Revenue
+            </button>
+
+            <button
+                @click="$router.push('/uikit/viewListOfSOA')"
+                class="bg-white border-2 border-blue-500 text-blue-700 px-6 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                View List of SOA
+            </button>
+        </div>
+
         <!-- Filters -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <input v-model="searchQuery" type="text" placeholder="Search by name, email, or phone..." class="md:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
@@ -284,7 +300,7 @@ function viewPaymentDetails(patient) {
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <button @click="viewPaymentDetails(patient)" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm font-medium">View</button>
+                                <button @click="$router.push('/uikit/PaymentDetails')" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm font-medium">View</button>
                             </td>
                         </tr>
                     </tbody>
@@ -297,3 +313,7 @@ function viewPaymentDetails(patient) {
         </div>
     </div>
 </template>
+
+<style scoped>
+/* Additional custom styles if needed */
+</style>
