@@ -29,9 +29,8 @@ const model = [
             { label: 'Clinic Services', icon: 'pi pi-fw pi-book', to: '/uikit/PatientService', roles: [UserRole.PATIENT] },
             { label: 'My Services and Appointments', icon: 'pi pi-fw pi-list', to: '/uikit/MyServicesAndAppointment', roles: [UserRole.PATIENT] },
             { label: 'Payment History', icon: 'pi pi-fw pi-money-bill', to: '/uikit/PaymentHistory', roles: [UserRole.PATIENT] },
-            { label: 'List Of Patients', icon: 'pi pi-fw pi-eye', to: '/uikit/ObgyneView2', roles: [UserRole.OBGYNE] },
-            { label: 'Familyplanning', icon: 'pi pi-fw pi-calendar', to: '/uikit/FamilyPlanningAdmission', roles: [UserRole.ADMIN, UserRole.MIDWIFE] }
-        ]   
+            { label: 'List Of Patients', icon: 'pi pi-fw pi-eye', to: '/uikit/ObgyneView2', roles: [UserRole.OBGYNE] }
+      ]   
     }
 ];
 // Filter model based on logged-in user's role
