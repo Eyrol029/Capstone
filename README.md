@@ -1,3 +1,17 @@
-Sakai is an application template for Vue based on the [create-vue](https://github.com/vuejs/create-vue), the recommended way to start a Vite-powered Vue projects.
+User Account Data for individual views:
+ADMIN:
+email: admin@gmail.com
+password: adminpassword1234
 
-Visit the [documentation](https://sakai.primevue.org/documentation) to get started.
+MIDWIFE:
+email: midwife@gmail.com
+password: midwifepassword1234
+
+OBGYNE
+email: obgyne@gmail.com
+password: obgynepassword1234
+
+PATIENT
+email: patient@gmail.com
+password: patientpassword1234
+
