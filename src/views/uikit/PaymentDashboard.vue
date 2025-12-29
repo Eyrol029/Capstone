@@ -1,78 +1,36 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+// --- State for the Patient List ---
 const searchQuery = ref('');
 const statusFilter = ref('all');
 const serviceFilter = ref('all');
 const sortField = ref('name');
 const sortOrder = ref('asc');
 
+// --- State for the Detail View / Modal ---
+const showDetails = ref(false);
+const selectedPatient = ref(null);
+const reminderType = ref('email');
+const reminderMessage = ref('');
+
 // Sample patient data
 const patients = ref([
-    {
-        id: 'P001',
-        name: 'Maria Santos',
-        email: 'maria.santos@email.com',
-        phone: '09123456789',
-        service: 'Prenatal Checkup',
-        totalBill: 5000,
-        amountPaid: 5000,
-        paymentStatus: 'paid'
-    },
-    {
-        id: 'P002',
-        name: 'Ana Cruz',
-        email: 'ana.cruz@email.com',
-        phone: '09234567890',
-        service: 'Normal Delivery',
-        totalBill: 25000,
-        amountPaid: 15000,
-        paymentStatus: 'partial'
-    },
-    {
-        id: 'P003',
-        name: 'Rosa Mendoza',
-        email: 'rosa.mendoza@email.com',
-        phone: '09345678901',
-        service: 'Family Planning',
-        totalBill: 2000,
-        amountPaid: 0,
-        paymentStatus: 'pending'
-    },
-    {
-        id: 'P004',
-        name: 'Elena Reyes',
-        email: 'elena.reyes@email.com',
-        phone: '09456789012',
-        service: 'Postnatal Care',
-        totalBill: 3500,
-        amountPaid: 1500,
-        paymentStatus: 'partial'
-    },
-    {
-        id: 'P005',
-        name: 'Carmen Garcia',
-        email: 'carmen.garcia@email.com',
-        phone: '09567890123',
-        service: 'Prenatal Checkup',
-        totalBill: 5000,
-        amountPaid: 5000,
-        paymentStatus: 'paid'
-    }
+    { id: 'P001', name: 'Maria Santos', email: 'maria.santos@email.com', phone: '09123456789', service: 'Prenatal Checkup', totalBill: 5000, amountPaid: 5000, paymentStatus: 'paid', reminders: [] },
+    { id: 'P002', name: 'Ana Cruz', email: 'ana.cruz@email.com', phone: '09234567890', service: 'Normal Delivery', totalBill: 25000, amountPaid: 15000, paymentStatus: 'partial', reminders: [] },
+    { id: 'P003', name: 'Rosa Mendoza', email: 'rosa.mendoza@email.com', phone: '09345678901', service: 'Family Planning', totalBill: 2000, amountPaid: 0, paymentStatus: 'pending', reminders: [] },
+    { id: 'P004', name: 'Elena Reyes', email: 'elena.reyes@email.com', phone: '09456789012', service: 'Postnatal Care', totalBill: 3500, amountPaid: 1500, paymentStatus: 'partial', reminders: [] },
+    { id: 'P005', name: 'Carmen Garcia', email: 'carmen.garcia@email.com', phone: '09567890123', service: 'Prenatal Checkup', totalBill: 5000, amountPaid: 5000, paymentStatus: 'paid', reminders: [] }
 ]);
 
-const services = computed(() => {
-    return ['all', ...new Set(patients.value.map((p) => p.service))];
-});
+// --- List Logic ---
+const services = computed(() => ['all', ...new Set(patients.value.map((p) => p.service))]);
 
 const filteredPatients = computed(() => {
-    return patients.value.filter((patient) => {
-        const matchesSearch = patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || patient.email.toLowerCase().includes(searchQuery.value.toLowerCase()) || patient.phone.includes(searchQuery.value);
-
-        const matchesStatus = statusFilter.value === 'all' || patient.paymentStatus === statusFilter.value;
-
-        const matchesService = serviceFilter.value === 'all' || patient.service === serviceFilter.value;
-
+    return patients.value.filter((p) => {
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || p.email.toLowerCase().includes(searchQuery.value.toLowerCase());
+        const matchesStatus = statusFilter.value === 'all' || p.paymentStatus === statusFilter.value;
+        const matchesService = serviceFilter.value === 'all' || p.service === serviceFilter.value;
         return matchesSearch && matchesStatus && matchesService;
     });
 });
@@ -81,226 +39,105 @@ const sortedPatients = computed(() => {
     const copy = [...filteredPatients.value];
     copy.sort((a, b) => {
         let aVal, bVal;
-
-        switch (sortField.value) {
-            case 'name':
-                aVal = a.name;
-                bVal = b.name;
-                break;
-            case 'totalBill':
-                aVal = a.totalBill;
-                bVal = b.totalBill;
-                break;
-            case 'amountPaid':
-                aVal = a.amountPaid;
-                bVal = b.amountPaid;
-                break;
-            case 'outstanding':
-                aVal = calculateOutstandingBalance(a);
-                bVal = calculateOutstandingBalance(b);
-                break;
+        if (sortField.value === 'outstanding') {
+            aVal = a.totalBill - a.amountPaid;
+            bVal = b.totalBill - b.amountPaid;
+        } else {
+            aVal = a[sortField.value];
+            bVal = b[sortField.value];
         }
-
-        if (typeof aVal === 'string') {
-            return sortOrder.value === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        }
-
+        if (typeof aVal === 'string') return sortOrder.value === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
         return sortOrder.value === 'asc' ? aVal - bVal : bVal - aVal;
     });
-
     return copy;
 });
 
-const statsFullyPaid = computed(() => sortedPatients.value.filter((p) => p.paymentStatus === 'paid').length);
-
-const statsPartial = computed(() => sortedPatients.value.filter((p) => p.paymentStatus === 'partial').length);
-
-const statsPending = computed(() => sortedPatients.value.filter((p) => p.paymentStatus === 'pending').length);
-
-function calculateOutstandingBalance(patient) {
-    return patient.totalBill - patient.amountPaid;
+// --- Detail View Logic ---
+function openDetails(patient) {
+    selectedPatient.value = patient;
+    showDetails.value = true;
+    reminderMessage.value = `Reminder: Outstanding balance of ${formatCurrency(patient.totalBill - patient.amountPaid)} due for ${patient.service}.`;
 }
 
-function getPaymentPercentage(patient) {
-    if (patient.totalBill === 0) return 0;
-    return Math.round((patient.amountPaid / patient.totalBill) * 100);
+function handleClose() {
+    showDetails.value = false;
+    selectedPatient.value = null;
 }
 
-function formatCurrency(amount) {
-    return '₱' + amount.toLocaleString();
+function handleSendReminder() {
+    alert(`Reminder sent via ${reminderType.value} to ${selectedPatient.value.name}`);
 }
 
-function handleSort(field) {
-    if (sortField.value === field) {
-        sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortField.value = field;
-        sortOrder.value = 'asc';
-    }
-}
-
+// --- Helpers ---
+function formatCurrency(amount) { return '₱' + (amount || 0).toLocaleString(); }
+function getPaymentPercentage(p) { return p.totalBill === 0 ? 0 : Math.round((p.amountPaid / p.totalBill) * 100); }
 function getStatusBg(status) {
-    switch (status) {
-        case 'paid':
-            return 'bg-green-100 text-green-700';
-        case 'partial':
-            return 'bg-yellow-100 text-yellow-700';
-        case 'pending':
-            return 'bg-red-100 text-red-700';
-    }
+    if (status === 'paid') return 'bg-green-100 text-green-700';
+    if (status === 'partial') return 'bg-yellow-100 text-yellow-700';
+    return 'bg-red-100 text-red-700';
+}
+function handleSort(field) {
+    if (sortField.value === field) sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+    else { sortField.value = field; sortOrder.value = 'asc'; }
 }
 </script>
 
 <template>
-    <div class="space-y-6 p-6 bg-white min-h-screen">
-        <!-- Action Buttons -->
+    <div class="space-y-6 p-6 bg-gray-50 min-h-screen">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <button
-                @click="$router.push('/uikit/viewListOfExpense')"
-                class="bg-white border-2 border-purple-500 text-purple-700 px-6 py-4 rounded-lg font-semibold hover:bg-purple-50 transition-colors shadow-sm flex items-center justify-center gap-2"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                </svg>
-                View List of Expenses
-            </button>
-
-            <button
-                @click="$router.push('/uikit/viewListOfRevenue')"
-                class="bg-white border-2 border-green-500 text-green-700 px-6 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors shadow-sm flex items-center justify-center gap-2"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                View List of Revenue
-            </button>
-
-            <button
-                @click="$router.push('/uikit/viewListOfSOA')"
-                class="bg-white border-2 border-blue-500 text-blue-700 px-6 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors shadow-sm flex items-center justify-center gap-2"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                View List of SOA
-            </button>
+            <button @click="$router.push('/uikit/viewListOfExpense')" class="bg-white border-2 border-purple-500 text-purple-700 px-6 py-4 rounded-lg font-semibold hover:bg-purple-50 flex items-center justify-center gap-2">View Expenses</button>
+            <button @click="$router.push('/uikit/viewListOfRevenue')" class="bg-white border-2 border-green-500 text-green-700 px-6 py-4 rounded-lg font-semibold hover:bg-green-50 flex items-center justify-center gap-2">View Revenue</button>
+            <button @click="$router.push('/uikit/viewListOfSOA')" class="bg-white border-2 border-blue-500 text-blue-700 px-6 py-4 rounded-lg font-semibold hover:bg-blue-50 flex items-center justify-center gap-2">View SOA</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg border shadow-sm"><p class="text-xs text-gray-500 uppercase font-bold">Total Patients</p><p class="text-2xl font-bold">{{ sortedPatients.length }}</p></div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-100 shadow-sm"><p class="text-xs text-green-600 uppercase font-bold">Paid</p><p class="text-2xl font-bold text-green-700">{{ patients.filter(p => p.paymentStatus === 'paid').length }}</p></div>
+            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100 shadow-sm"><p class="text-xs text-yellow-600 uppercase font-bold">Partial</p><p class="text-2xl font-bold text-yellow-700">{{ patients.filter(p => p.paymentStatus === 'partial').length }}</p></div>
+            <div class="bg-red-50 p-4 rounded-lg border border-red-100 shadow-sm"><p class="text-xs text-red-600 uppercase font-bold">Pending</p><p class="text-2xl font-bold text-red-700">{{ patients.filter(p => p.paymentStatus === 'pending').length }}</p></div>
         </div>
 
-        <!-- Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input v-model="searchQuery" type="text" placeholder="Search by name, email, or phone..." class="md:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-
-            <select v-model="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-lg shadow-sm border">
+            <input v-model="searchQuery" type="text" placeholder="Search patients..." class="md:col-span-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            <select v-model="statusFilter" class="px-4 py-2 border rounded-lg">
                 <option value="all">All Statuses</option>
                 <option value="paid">Paid</option>
                 <option value="partial">Partial</option>
                 <option value="pending">Pending</option>
             </select>
-
-            <select v-model="serviceFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option v-for="service in services" :key="service" :value="service">
-                    {{ service === 'all' ? 'All Services' : service }}
-                </option>
+            <select v-model="serviceFilter" class="px-4 py-2 border rounded-lg">
+                <option v-for="s in services" :key="s" :value="s">{{ s === 'all' ? 'All Services' : s }}</option>
             </select>
         </div>
 
-        <!-- Summary Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg shadow">
-                <p class="text-sm text-gray-600 mb-1">Total Patients</p>
-                <p class="text-3xl font-bold">{{ sortedPatients.length }}</p>
-            </div>
-            <div class="bg-green-50 text-green-700 p-4 rounded-lg shadow">
-                <p class="text-sm mb-1 font-medium">Fully Paid</p>
-                <p class="text-3xl font-bold">{{ statsFullyPaid }}</p>
-            </div>
-            <div class="bg-yellow-50 text-yellow-700 p-4 rounded-lg shadow">
-                <p class="text-sm mb-1 font-medium">Partial Payments</p>
-                <p class="text-3xl font-bold">{{ statsPartial }}</p>
-            </div>
-            <div class="bg-red-50 text-red-700 p-4 rounded-lg shadow">
-                <p class="text-sm mb-1 font-medium">Pending</p>
-                <p class="text-3xl font-bold">{{ statsPending }}</p>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden shadow">
+        <div class="bg-white border rounded-xl overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 border-b">
                         <tr>
-                            <th class="px-6 py-4 text-left">
-                                <button @click="handleSort('name')" class="flex items-center gap-2 font-semibold text-sm hover:text-blue-600">
-                                    Patient Name
-                                    <span v-if="sortField === 'name'">
-                                        {{ sortOrder === 'asc' ? '↑' : '↓' }}
-                                    </span>
-                                </button>
-                            </th>
-                            <th class="px-6 py-4 text-left font-semibold text-sm">Service</th>
-                            <th class="px-6 py-4 text-right">
-                                <button @click="handleSort('totalBill')" class="flex items-center justify-end gap-2 font-semibold text-sm ml-auto hover:text-blue-600">
-                                    Total Bill
-                                    <span v-if="sortField === 'totalBill'">
-                                        {{ sortOrder === 'asc' ? '↑' : '↓' }}
-                                    </span>
-                                </button>
-                            </th>
-                            <th class="px-6 py-4 text-right">
-                                <button @click="handleSort('amountPaid')" class="flex items-center justify-end gap-2 font-semibold text-sm ml-auto hover:text-blue-600">
-                                    Amount Paid
-                                    <span v-if="sortField === 'amountPaid'">
-                                        {{ sortOrder === 'asc' ? '↑' : '↓' }}
-                                    </span>
-                                </button>
-                            </th>
-                            <th class="px-6 py-4 text-right">
-                                <button @click="handleSort('outstanding')" class="flex items-center justify-end gap-2 font-semibold text-sm ml-auto hover:text-blue-600">
-                                    Outstanding
-                                    <span v-if="sortField === 'outstanding'">
-                                        {{ sortOrder === 'asc' ? '↑' : '↓' }}
-                                    </span>
-                                </button>
-                            </th>
-                            <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
-                            <th class="px-6 py-4 text-center font-semibold text-sm">Progress</th>
-                            <th class="px-6 py-4 text-center font-semibold text-sm">Action</th>
+                            <th @click="handleSort('name')" class="px-6 py-4 cursor-pointer hover:text-blue-600 font-bold text-xs uppercase tracking-wider">Patient</th>
+                            <th @click="handleSort('totalBill')" class="px-6 py-4 cursor-pointer text-right hover:text-blue-600 font-bold text-xs uppercase tracking-wider">Total Bill</th>
+                            <th @click="handleSort('amountPaid')" class="px-6 py-4 cursor-pointer text-right hover:text-blue-600 font-bold text-xs uppercase tracking-wider">Paid</th>
+                            <th @click="handleSort('outstanding')" class="px-6 py-4 cursor-pointer text-right hover:text-blue-600 font-bold text-xs uppercase tracking-wider">Outstanding</th>
+                            <th class="px-6 py-4 text-center font-bold text-xs uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-center font-bold text-xs uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr v-for="patient in sortedPatients" :key="patient.id" class="hover:bg-gray-50 transition-colors">
+                    <tbody class="divide-y divide-gray-100">
+                        <tr v-for="p in sortedPatients" :key="p.id" class="hover:bg-blue-50/30 transition-colors">
                             <td class="px-6 py-4">
-                                <div>
-                                    <p class="font-medium">{{ patient.name }}</p>
-                                    <p class="text-sm text-gray-500">{{ patient.email }}</p>
-                                </div>
+                                <p class="font-bold text-gray-800">{{ p.name }}</p>
+                                <p class="text-[11px] text-gray-500 font-medium">{{ p.service }}</p>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ patient.service }}</td>
-                            <td class="px-6 py-4 text-right font-medium">
-                                {{ formatCurrency(patient.totalBill) }}
-                            </td>
-                            <td class="px-6 py-4 text-right font-medium text-green-600">
-                                {{ formatCurrency(patient.amountPaid) }}
-                            </td>
-                            <td class="px-6 py-4 text-right font-medium text-red-600">
-                                {{ formatCurrency(calculateOutstandingBalance(patient)) }}
-                            </td>
+                            <td class="px-6 py-4 text-right font-bold text-gray-700">{{ formatCurrency(p.totalBill) }}</td>
+                            <td class="px-6 py-4 text-right font-bold text-green-600">{{ formatCurrency(p.amountPaid) }}</td>
+                            <td class="px-6 py-4 text-right font-bold text-red-600">{{ formatCurrency(p.totalBill - p.amountPaid) }}</td>
                             <td class="px-6 py-4 text-center">
-                                <span :class="['inline-block px-3 py-1 rounded-full text-sm font-medium capitalize', getStatusBg(patient.paymentStatus)]">
-                                    {{ patient.paymentStatus }}
+                                <span :class="['px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter', getStatusBg(p.paymentStatus)]">
+                                    {{ p.paymentStatus }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full transition-all" :style="{ width: getPaymentPercentage(patient) + '%' }"></div>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-600"> {{ getPaymentPercentage(patient) }}% </span>
-                                </div>
-                            </td>
                             <td class="px-6 py-4 text-center">
-                                <button @click="$router.push('/uikit/PaymentDetails')" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 text-sm font-medium">View</button>
+                                <button @click="openDetails(p)" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-black shadow-md transition-all active:scale-95">VIEW</button>
                             </td>
                         </tr>
                     </tbody>
@@ -308,12 +145,51 @@ function getStatusBg(status) {
             </div>
         </div>
 
-        <div v-if="sortedPatients.length === 0" class="text-center py-12">
-            <p class="text-gray-500">No patients found matching your filters.</p>
+        <div v-if="showDetails && selectedPatient" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" @click.self="handleClose">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-t-8 border-blue-600">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800">{{ selectedPatient.name }}</h2>
+                        <p class="text-blue-600 font-bold text-sm uppercase tracking-widest">{{ selectedPatient.service }}</p>
+                    </div>
+                    <button @click="handleClose" class="text-3xl text-gray-400 hover:text-gray-600 transition-transform hover:rotate-90">&times;</button>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <p class="text-[10px] text-gray-500 font-black uppercase mb-1">Total Bill</p>
+                            <p class="text-xl font-black text-gray-800">{{ formatCurrency(selectedPatient.totalBill) }}</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                            <p class="text-[10px] text-green-600 font-black uppercase mb-1">Amount Paid</p>
+                            <p class="text-xl font-black text-green-700">{{ formatCurrency(selectedPatient.amountPaid) }}</p>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                            <p class="text-[10px] text-red-600 font-black uppercase mb-1">Outstanding</p>
+                            <p class="text-xl font-black text-red-700">{{ formatCurrency(selectedPatient.totalBill - selectedPatient.amountPaid) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 shadow-inner">
+                        <h3 class="text-sm font-black text-blue-900 mb-4 flex items-center gap-2 uppercase tracking-widest"><span>📤</span> Send Reminder</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-xl bg-white cursor-pointer transition-all" :class="reminderType === 'email' ? 'border-blue-500 scale-[1.02]' : 'border-gray-100'">
+                                    <input type="radio" v-model="reminderType" value="email" class="w-4 h-4 accent-blue-600">
+                                    <span class="text-xs font-black uppercase">Email</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-xl bg-white cursor-pointer transition-all" :class="reminderType === 'sms' ? 'border-blue-500 scale-[1.02]' : 'border-gray-100'">
+                                    <input type="radio" v-model="reminderType" value="sms" class="w-4 h-4 accent-blue-600">
+                                    <span class="text-xs font-black uppercase">SMS</span>
+                                </label>
+                            </div>
+                            <textarea v-model="reminderMessage" rows="3" class="w-full p-4 border rounded-xl focus:ring-4 focus:ring-blue-100 outline-none text-sm font-medium border-gray-200"></textarea>
+                            <button @click="handleSendReminder" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">Send Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
-
-<style scoped>
-/* Additional custom styles if needed */
-</style>

@@ -49,7 +49,7 @@ const form = reactive({
 });
 
 // Handle service selection
-function selectType(type: string) {
+function selectType( type: string) {
   if (type === 'Family Planning') {
     router.push('/uikit/FamilyPlanningAdmission');
     return;
@@ -193,7 +193,7 @@ async function handleSubmit() {
               <td class="td">{{ service.dateAvailed }}</td>
               <td class="td">{{ service.remarks }}</td>
               <td class="td">
-                <button class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
+                <button @click="router.push(`/uikit/PatientIndividual`)" class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
                   View
                 </button>
               </td>

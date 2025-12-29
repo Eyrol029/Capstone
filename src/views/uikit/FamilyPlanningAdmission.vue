@@ -158,7 +158,24 @@ const formData = ref({
             adnexalMass: false,
             uterinePosition: null,
             uterineDepth: ''
-        }
+        },
+        sideB: {
+    dateOfVisit: '2025-12-29',
+    serviceProvider: '',
+    medicalFindings: '',
+    methodAccepted: '',
+    followUpDate: '',
+    // Pregnancy Checklist
+    pregnancyCheck: {
+        isFullyBreastfeeding: false,
+        abstinence: false,
+        babyInLast4Weeks: false,
+        mensesInPast7Days: false,
+        miscarriageInPast7Days: false,
+        reliableContraceptive: false
+    }
+}
+
     }
 });
 
@@ -925,25 +942,123 @@ function resetForm() {
                 </div>
             </div>
             <!-- SIDE B -->
-            
+      <div class="border-t pt-4">
+                    <h3 class="font-bold mb-4">II. OBSTETRIC HISTORY</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm">Number of pregnancies: G</span>
+                            <input v-model="formData.obstetric.numPregnancies" type="text" class="w-16 px-2 py-1 border border-gray-300 rounded" />
+                            <span>P</span>
+                            <input v-model="formData.obstetric.fullTerm" type="text" class="w-16 px-2 py-1 border border-gray-300 rounded" />
+                        </div>
 
-            <!-- Form Actions -->
-            <div class="border-t pt-6 flex gap-4">
-                <button
-                    type="submit"
-                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                    Submit Form
-                </button>
-                <button
-                    type="button"
-                    @click="resetForm"
-                    class="px-8 bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
-                >
-                    Reset
-                </button>
-            </div>
-        </form>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">Full Term</label>
+                                <input v-model="formData.obstetric.fullTerm" type="text" class="w-20 px-2 py-1 border border-gray-300 rounded" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">Premature</label>
+                                <input v-model="formData.obstetric.premature" type="text" class="w-20 px-2 py-1 border border-gray-300 rounded" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">Abortion</label>
+                                <input v-model="formData.obstetric.abortion" type="text" class="w-20 px-2 py-1 border border-gray-300 rounded" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm">Living Children</label>
+                                <input v-model="formData.obstetric.livingChildren" type="text" class="w-20 px-2 py-1 border border-gray-300 rounded" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm">Last menstrual period:</label>
+                                <input v-model="formData.obstetric.lastMenstrualStart" type="date" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" />
+                            </div>
+                            <div>
+                                <label class="text-sm">Previous menstrual period:</label>
+                                <input v-model="formData.obstetric.previousMenstrualPeriod" type="date" class="w-full px-3 py-2 border border-gray-300 rounded mt-1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t-4 border-blue-600 pt-8 mt-12">
+                    <h2 class="text-xl font-bold mb-6 text-blue-900">SIDE B: FAMILY PLANNING ASSESSMENT RECORD</h2>
+                    
+                    <div class="bg-white border rounded-xl shadow-sm p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Date of Visit</label>
+                                <input v-model="formData.physical.sideB.dateOfVisit" type="date" class="w-full p-2 border rounded-md" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Service Provider Name</label>
+                                <input v-model="formData.physical.sideB.serviceProvider" type="text" class="w-full p-2 border rounded-md" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Medical Findings</label>
+                            <textarea v-model="formData.physical.sideB.medicalFindings" rows="3" class="w-full p-2 border rounded-md"></textarea>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="font-bold text-lg mb-4 text-blue-900 underline">How to be Reasonably Sure a Client is Not Pregnant</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">1. Baby &lt;6 months old / Fully Breastfeeding / No period?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.isFullyBreastfeeding"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.isFullyBreastfeeding"> No</label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded">
+                                    <span class="text-sm">2. Abstained from sex since last period/delivery?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.abstinence"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.abstinence"> No</label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">3. Had a baby in the last 4 weeks?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.babyInLast4Weeks"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.babyInLast4Weeks"> No</label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded">
+                                    <span class="text-sm">4. Period started within the past 7 days?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.mensesInPast7Days"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.mensesInPast7Days"> No</label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">5. Miscarriage/Abortion in the last 7 days?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.miscarriageInPast7Days"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.miscarriageInPast7Days"> No</label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded">
+                                    <span class="text-sm">6. Using reliable contraceptive consistently?</span>
+                                    <div class="flex gap-4">
+                                        <label><input type="radio" :value="true" v-model="formData.physical.sideB.pregnancyCheck.reliableContraceptive"> Yes</label>
+                                        <label><input type="radio" :value="false" v-model="formData.physical.sideB.pregnancyCheck.reliableContraceptive"> No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 mt-8">
+                            <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded font-bold hover:bg-blue-700">SUBMIT RECORD</button>
+                            <button @click="resetForm" type="button" class="bg-gray-200 px-8 py-3 rounded font-bold">RESET</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </template>
